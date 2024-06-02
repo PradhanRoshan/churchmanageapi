@@ -32,3 +32,7 @@ Revenue Model
     Subscription-based pricing model with different tiers (basic, standard, premium).
     Customization and consulting services for large churches.
     Integration services with other software solutions.
+
+
+    https://trello.com/b/c7QJNBjA/church-management-software
+    
