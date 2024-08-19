@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 @Table(name = "tithe_and_offering")
 @NamedQuery(name = "TitheAndOffering.findAll", query = "SELECT t FROM TitheAndOffering t")
-public class TitheAndOffering implements Serializable {
+public class TitheAndOffering extends Auditable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id

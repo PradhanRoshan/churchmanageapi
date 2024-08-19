@@ -6,7 +6,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "budgets")
 @NamedQuery(name = "Budget.findAll", query = "SELECT b FROM Budget b")
-public class Budget implements Serializable {
+public class Budget extends Auditable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id

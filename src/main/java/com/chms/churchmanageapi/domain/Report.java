@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 @Table(name = "reports")
 @NamedQuery(name = "Report.findAll", query = "SELECT r FROM Report r")
-public class Report implements Serializable {
+public class Report extends Auditable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id

@@ -8,7 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "payment_method")
 @NamedQuery(name = "PaymentMethod.findAll", query = "SELECT p FROM PaymentMethod p")
-public class PaymentMethod implements Serializable {
+public class PaymentMethod extends Auditable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id

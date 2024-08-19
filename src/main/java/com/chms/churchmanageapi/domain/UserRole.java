@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Entity
 @Table(name="user_roles")
 @NamedQuery(name="UserRole.findAll", query="SELECT u FROM UserRole u")
-public class UserRole implements Serializable {
+public class UserRole extends Auditable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId

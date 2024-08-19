@@ -6,7 +6,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "family_relations")
 @NamedQuery(name = "FamilyRelation.findAll", query = "SELECT f FROM FamilyRelation f")
-public class FamilyRelation implements Serializable {
+public class FamilyRelation extends Auditable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id

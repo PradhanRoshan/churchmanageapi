@@ -7,7 +7,7 @@ import java.util.List;
 @Entity
 @Table(name = "address")
 @NamedQuery(name = "Address.findAll", query = "SELECT a FROM Address a")
-public class Address implements Serializable {
+public class Address extends Auditable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id

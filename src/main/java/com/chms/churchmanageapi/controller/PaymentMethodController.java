@@ -6,10 +6,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "OK"),
@@ -29,6 +28,12 @@ public class PaymentMethodController {
     @PostMapping(value = "/add-payment", produces = "application/json")
     public String addPaymentMethod(@RequestBody PaymentMethodDTO paymentMethodDTO){
         return paymentMethodService.addPaymentMethod(paymentMethodDTO);
+    }
+
+    @Operation(summary = "Get All Payment Methods")
+    @GetMapping(value = "/get-payment", produces = "application/json")
+    public List<PaymentMethodDTO> getAllPaymentMethod(){
+        return paymentMethodService.getPaymentMethodList();
     }
 
 }

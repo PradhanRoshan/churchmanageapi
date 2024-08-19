@@ -8,7 +8,7 @@ import java.util.List;
 @Entity
 @Table(name = "fund_type")
 @NamedQuery(name = "FundType.findAll", query = "SELECT f FROM FundType f")
-public class FundType implements Serializable {
+public class FundType extends Auditable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id

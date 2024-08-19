@@ -9,7 +9,7 @@ import java.util.Date;
 @Entity
 @Table(name = "events")
 @NamedQuery(name = "Event.findAll", query = "SELECT e FROM Event e")
-public class Event implements Serializable {
+public class Event extends Auditable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
