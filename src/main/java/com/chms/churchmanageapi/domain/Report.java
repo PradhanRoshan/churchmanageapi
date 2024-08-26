@@ -30,6 +30,10 @@ public class Report extends Auditable implements Serializable {
     @Column(name = "content", length = 255, nullable = false)
     private String content;
 
+    @Temporal(TemporalType.DATE)
+    @Column(name = "report_exptn", nullable = true)
+    private Date reportExptn;
+
     public Report() {
     }
 
@@ -73,5 +77,13 @@ public class Report extends Auditable implements Serializable {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Date getReportExptn() {
+        return reportExptn;
+    }
+
+    public void setReportExptn(Date reportExptn) {
+        this.reportExptn = reportExptn;
     }
 }

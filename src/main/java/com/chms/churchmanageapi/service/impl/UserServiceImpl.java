@@ -1,9 +1,12 @@
 package com.chms.churchmanageapi.service.impl;
 
+import com.chms.churchmanageapi.config.JwtUtil;
 import com.chms.churchmanageapi.domain.Member;
 import com.chms.churchmanageapi.domain.User;
 import com.chms.churchmanageapi.domain.UserRole;
 import com.chms.churchmanageapi.domain.UserRolePK;
+import com.chms.churchmanageapi.dto.AuthRequestDTO;
+import com.chms.churchmanageapi.dto.LoginResponseDTO;
 import com.chms.churchmanageapi.dto.SignUpDTO;
 import com.chms.churchmanageapi.repository.MemberRepository;
 import com.chms.churchmanageapi.repository.RoleRepository;
@@ -12,6 +15,11 @@ import com.chms.churchmanageapi.repository.UserRoleRepository;
 import com.chms.churchmanageapi.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +36,15 @@ public class UserServiceImpl implements UserService {
     private UserRoleRepository userRoleRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Override
     @Transactional
@@ -48,6 +65,20 @@ public class UserServiceImpl implements UserService {
         member.setUser(user);
         memberRepository.save(member);
         return "User registered successfully";
+    }
+
+    @Override
+    public ResponseEntity<LoginResponseDTO> userLoginAuthentication(AuthRequestDTO authRequest) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+        final String jwt = jwtUtil.generateToken(userDetails);
+        LoginResponseDTO loginResponse = new LoginResponseDTO();//.setToken(jwt).setExpiresIn(jwtService.getExpirationTime());
+        loginResponse.setToken(jwt);
+        loginResponse.setUserRole(userRepository.findByUsername(userDetails.getUsername()).get().getRoles().get(0).getRoleId());
+        loginResponse.setExpiresIn(jwtUtil.getExpirationTime());
+
+        return ResponseEntity.ok(loginResponse);
+//        return null;
     }
 
     private UserRole setDefaultUserRole(User user) {

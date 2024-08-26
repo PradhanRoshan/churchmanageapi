@@ -2,6 +2,7 @@ package com.chms.churchmanageapi.domain;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "budgets")
@@ -22,6 +23,10 @@ public class Budget extends Auditable implements Serializable {
 
     @Column(name = "allocated_amount", nullable = true)
     private Double allocatedAmount;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "budget_exptn", nullable = true)
+    private Date budgetExptn;
 
     public Budget() {
     }
@@ -56,5 +61,13 @@ public class Budget extends Auditable implements Serializable {
 
     public void setAllocatedAmount(Double allocatedAmount) {
         this.allocatedAmount = allocatedAmount;
+    }
+
+    public Date getBudgetExptn() {
+        return budgetExptn;
+    }
+
+    public void setBudgetExptn(Date budgetExptn) {
+        this.budgetExptn = budgetExptn;
     }
 }

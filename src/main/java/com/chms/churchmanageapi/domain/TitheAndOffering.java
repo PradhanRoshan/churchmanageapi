@@ -20,6 +20,10 @@ public class TitheAndOffering extends Auditable implements Serializable {
     private double amountContributed;
 
     @Temporal(TemporalType.DATE)
+    @Column(name = "tithe_offering_exptn", nullable = true)
+    private Date titheOfferingExptn;
+
+    @Temporal(TemporalType.DATE)
     @Column(name = "contributed_date", nullable = false)
     private Date contributedDate;
 
@@ -97,5 +101,13 @@ public class TitheAndOffering extends Auditable implements Serializable {
 
     public void setPaymentMethod(PaymentMethod paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public Date getTitheOfferingExptn() {
+        return titheOfferingExptn;
+    }
+
+    public void setTitheOfferingExptn(Date titheOfferingExptn) {
+        this.titheOfferingExptn = titheOfferingExptn;
     }
 }

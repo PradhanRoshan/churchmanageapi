@@ -2,6 +2,7 @@ package com.chms.churchmanageapi.domain;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "family_relations")
@@ -24,6 +25,10 @@ public class FamilyRelation extends Auditable implements Serializable {
 
     @Column(name = "relationship", length = 255, nullable = false)
     private String relationship;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "fam_rel_exptn", nullable = true)
+    private Date famRelExptn;
 
     public FamilyRelation() {
     }
@@ -60,5 +65,13 @@ public class FamilyRelation extends Auditable implements Serializable {
 
     public void setRelationship(String relationship) {
         this.relationship = relationship;
+    }
+
+    public Date getFamRelExptn() {
+        return famRelExptn;
+    }
+
+    public void setFamRelExptn(Date famRelExptn) {
+        this.famRelExptn = famRelExptn;
     }
 }

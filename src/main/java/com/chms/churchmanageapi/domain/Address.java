@@ -2,6 +2,7 @@ package com.chms.churchmanageapi.domain;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -29,6 +30,10 @@ public class Address extends Auditable implements Serializable {
 
     @Column(length = 255)
     private String zip;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "addr_exptn", nullable = true)
+    private Date addrExptn;
 
     @OneToMany(mappedBy = "address")
     private List<ChurchInformation> churchInformations;
@@ -115,6 +120,14 @@ public class Address extends Auditable implements Serializable {
 
     public void setMembers(List<Member> members) {
         this.members = members;
+    }
+
+    public Date getAddrExptn() {
+        return addrExptn;
+    }
+
+    public void setAddrExptn(Date addrExptn) {
+        this.addrExptn = addrExptn;
     }
 
     public Member addMember(Member member) {

@@ -30,6 +30,10 @@ public class Event extends Auditable implements Serializable {
     @Column(name = "event_description", length = 255, nullable = true)
     private String eventDescription;
 
+    @Temporal(TemporalType.DATE)
+    @Column(name = "event_exptn", nullable = true)
+    private Date eventExptn;
+
     @OneToMany(mappedBy = "event")
     private List<Registration> registrations;
 
@@ -95,5 +99,13 @@ public class Event extends Auditable implements Serializable {
 
     public void setVolunteerActivities(List<VolunteerActivity> volunteerActivities) {
         this.volunteerActivities = volunteerActivities;
+    }
+
+    public Date getEventExptn() {
+        return eventExptn;
+    }
+
+    public void setEventExptn(Date eventExptn) {
+        this.eventExptn = eventExptn;
     }
 }

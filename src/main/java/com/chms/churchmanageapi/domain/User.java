@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -27,6 +28,10 @@ public class User extends Auditable implements Serializable, UserDetails {
 
     @Column(name = "email", length = 255, nullable = false, unique = true)
     private String email;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "user_exptn", nullable = true)
+    private Date userExptn;
 
     @OneToOne(mappedBy = "user")
     private Member member;
@@ -156,5 +161,13 @@ public class User extends Auditable implements Serializable, UserDetails {
 
     public void setReports(List<Report> reports) {
         this.reports = reports;
+    }
+
+    public Date getUserExptn() {
+        return userExptn;
+    }
+
+    public void setUserExptn(Date userExptn) {
+        this.userExptn = userExptn;
     }
 }

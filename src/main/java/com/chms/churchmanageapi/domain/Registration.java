@@ -28,10 +28,22 @@ public class Registration extends Auditable implements Serializable {
     @Column(name = "registration_date", nullable = false)
     private Date registrationDate;
 
+    @Temporal(TemporalType.DATE)
+    @Column(name = "registration_exptn", nullable = true)
+    private Date registrationExptn;
+
     public Registration() {
     }
 
     // Getters and setters
+
+    public Date getRegistrationExptn() {
+        return registrationExptn;
+    }
+
+    public void setRegistrationExptn(Date registrationExptn) {
+        this.registrationExptn = registrationExptn;
+    }
 
     public Event getEvent() {
         return event;
