@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponseDTO {
     private String token;
-
+    private int userRole;
     private long expiresIn;
 
     public String getToken() {

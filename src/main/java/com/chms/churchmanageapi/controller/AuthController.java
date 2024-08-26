@@ -3,6 +3,7 @@ package com.chms.churchmanageapi.controller;
 import com.chms.churchmanageapi.config.JwtUtil;
 import com.chms.churchmanageapi.dto.AuthRequestDTO;
 import com.chms.churchmanageapi.dto.LoginResponseDTO;
+import com.chms.churchmanageapi.dto.SignUpDTO;
 import com.chms.churchmanageapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,13 +38,14 @@ public class AuthController {
         final String jwt = jwtUtil.generateToken(userDetails);
         LoginResponseDTO loginResponse = new LoginResponseDTO();//.setToken(jwt).setExpiresIn(jwtService.getExpirationTime());
         loginResponse.setToken(jwt);
+        loginResponse.setUserRole(2);
         loginResponse.setExpiresIn(jwtUtil.getExpirationTime());
 
         return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping(value = "/signup", produces = "application/json")
-    public String registerUser(@RequestBody AuthRequestDTO registerRequest) {
-      return  userService.registerUser(registerRequest);
+    public String registerUser(@RequestBody SignUpDTO signUpDTO) {
+      return  userService.registerUser(signUpDTO);
     }
 }

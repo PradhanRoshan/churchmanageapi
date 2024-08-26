@@ -13,12 +13,12 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-//@SpringBootApplication
+@SpringBootApplication
 @EnableAsync
 @EnableCaching
 @EntityScan("com.chms.churchmanageapi.domain")
 @ComponentScan(basePackages = {"com.chms.churchmanageapi.*"})
-@SpringBootApplication(scanBasePackages = "com.chms.churchmanageapi")
+//@SpringBootApplication(scanBasePackages = "com.chms.churchmanageapi")
 public class ChurchManageApiApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {

@@ -25,17 +25,17 @@ public class Member extends Auditable implements Serializable {
     @Column(name = "first_name", length = 255, nullable = false)
     private String firstName;
 
-    @Column(name = "gender", length = 255, nullable = false)
+    @Column(name = "gender", length = 255, nullable = true)
     private String gender;
 
     @Column(name = "last_name", length = 255, nullable = false)
     private String lastName;
 
-    @Column(name = "marital_status", length = 255, nullable = false)
+    @Column(name = "marital_status", length = 255, nullable = true)
     private String maritalStatus;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "member_dob", nullable = false)
+    @Column(name = "member_dob", nullable = true)
     private Date memberDob;
 
     @Temporal(TemporalType.DATE)
@@ -45,7 +45,7 @@ public class Member extends Auditable implements Serializable {
     @Column(name = "middle_name", length = 255, nullable = true)
     private String middleName;
 
-    @Column(name = "phone", length = 255, nullable = false)
+    @Column(name = "phone", length = 255, nullable = true)
     private String phone;
 
     @ManyToOne
