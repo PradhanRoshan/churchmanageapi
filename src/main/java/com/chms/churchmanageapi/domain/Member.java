@@ -1,5 +1,6 @@
 package com.chms.churchmanageapi.domain;
 
+import com.chms.churchmanageapi.dto.AddressDto;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
