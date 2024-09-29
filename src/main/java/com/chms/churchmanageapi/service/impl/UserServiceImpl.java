@@ -64,6 +64,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String resetUserPassword(ResetPasswordDTO resetPasswordDTO) {
+        Optional<User> user = userRepository.findByUsername(resetPasswordDTO.getUsername());
+        if (!user.isPresent()) {
+          return "User not found";
+        }
+        User activeUser = user.get();
+        activeUser.setPassword(passwordEncoder.encode(resetPasswordDTO.getPassword()));
+        userRepository.save(activeUser);
+        return "Password changed successfully";
+    }
+
+    @Override
     public ResponseEntity<LoginResponseDTO> userLoginAuthentication(AuthRequestDTO authRequest) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());

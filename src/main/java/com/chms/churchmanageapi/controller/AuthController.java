@@ -3,6 +3,7 @@ package com.chms.churchmanageapi.controller;
 import com.chms.churchmanageapi.config.JwtUtil;
 import com.chms.churchmanageapi.dto.AuthRequestDTO;
 import com.chms.churchmanageapi.dto.LoginResponseDTO;
+import com.chms.churchmanageapi.dto.ResetPasswordDTO;
 import com.chms.churchmanageapi.dto.SignUpDTO;
 import com.chms.churchmanageapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +50,10 @@ public class AuthController {
     @PostMapping(value = "/signup", produces = "application/json")
     public String registerUser(@RequestBody SignUpDTO signUpDTO) {
       return  userService.registerUser(signUpDTO);
+    }
+
+    @PostMapping(value = "/reset-password", produces = "application/json")
+    public String resetUserPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
+        return  userService.resetUserPassword(resetPasswordDTO);
     }
 }
