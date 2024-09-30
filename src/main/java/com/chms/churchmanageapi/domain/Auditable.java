@@ -6,6 +6,7 @@ import jakarta.persistence.MappedSuperclass;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
@@ -21,9 +22,9 @@ public class Auditable implements Serializable {
     @CreationTimestamp
     private Timestamp dttmCreate;
 
-    @Column(name = "DTTM_LST_UPDT", updatable = false)
-    @CreationTimestamp
-    private  Timestamp dttmLstUpdt;
+    @Column(name = "DTTM_LST_UPDT")
+    @LastModifiedDate
+    private Timestamp dttmLstUpdt;
 
     @Column(name = "ID_USER_CREATE", updatable = false)
     @CreatedBy
