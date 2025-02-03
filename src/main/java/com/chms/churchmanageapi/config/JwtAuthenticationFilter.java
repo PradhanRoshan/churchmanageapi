@@ -48,7 +48,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 // Extract username and validate JWT
                 username = jwtUtil.extractUsername(jwt);
+
+                logger.info("JWT Token found. Extracted username: {}", username);
             }
+            else {
+                logger.warn("No JWT Token found in the Authorization header.");
+            }
+
+
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
@@ -59,11 +66,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                    logger.info("Authenticated user: {}", username);
                 }
+
+                else {
+                    logger.warn("JWT Token validation failed for user: {}", username);
+                }
+
+
             }
 
         } catch (Exception exception) {
-            logger.error("JWT Token has expired", exception);
+            logger.error("JWT Token has expired or is invalid", exception);
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
 //        catch (ExpiredJwtException e) {

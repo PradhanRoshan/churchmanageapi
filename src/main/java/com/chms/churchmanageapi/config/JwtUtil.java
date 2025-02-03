@@ -4,6 +4,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,8 @@ import java.util.function.Function;
 public class JwtUtil {
 
 //    private final String SECRET_KEY = "2D4A614E645267556B58703273357638792F423F4428472B4B6250655368566D";
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     @Value("${security.jwt.secret-key}")
     private String SECRET_KEY;
@@ -54,22 +58,40 @@ public class JwtUtil {
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
+        if (jwtExpiration <= 0) {
+            throw new IllegalArgumentException("JWT expiration time must be a positive value");
+        }
+
+        Date now = new Date();
+        Date expirationDate = new Date(now.getTime() + jwtExpiration);
+
+        logger.info("Generating token for user: {}, expiration: {}", subject, expirationDate);
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .setIssuedAt(now)
+                .setExpiration(expirationDate)
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        boolean isValid = username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        if (!isValid) {
+            logger.warn("Token validation failed for user: {}", username);
+        }
+        return isValid;
     }
 
     private Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+        Date expiration = extractExpiration(token);
+        boolean isExpired = expiration.before(new Date());
+        if (isExpired) {
+            logger.info("Token expired: {}", token);
+        }
+        return isExpired;
     }
 
     private Date extractExpiration(String token) {

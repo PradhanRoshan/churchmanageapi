@@ -1,6 +1,7 @@
 package com.chms.churchmanageapi.service.impl;
 
 import com.chms.churchmanageapi.config.JwtUtil;
+import com.chms.churchmanageapi.config.UserContextUtil;
 import com.chms.churchmanageapi.domain.*;
 import com.chms.churchmanageapi.dto.*;
 import com.chms.churchmanageapi.repository.MemberRepository;
@@ -10,6 +11,7 @@ import com.chms.churchmanageapi.repository.UserRoleRepository;
 import com.chms.churchmanageapi.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,6 +44,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    private static final int MEMBER_ROLE_ID = 2;
+
     @Override
     @Transactional
     public String registerUser(SignUpDTO signUpDTO) {
@@ -49,31 +53,55 @@ public class UserServiceImpl implements UserService {
         if (users.isPresent()) {
             return "Username is already in use";
         }
-        Member member = new Member();
-//      Create User
-        User user = saveUserInfo(signUpDTO.getUser());
-//      Set all members to default role as Member
-        UserRole userRole = setDefaultUserRole(user);
-        member.setMemberId(generateMemberId(user));
-        member.setFirstName(signUpDTO.getFirstName());
-        member.setLastName(signUpDTO.getLastName());
-        member.setEmailId(user.getEmail());
-        member.setUser(user);
-        memberRepository.save(member);
-        return "User registered successfully";
+        try {
+            // Setting username to be used in auditing when authentication is missing
+            UserContextUtil.setUser(signUpDTO.getUser().getUsername());
+
+            Member member = new Member();
+            // Create User
+            User user = saveUserInfo(signUpDTO.getUser());
+            // Set all members to default role as Member
+            UserRole userRole = setDefaultUserRole(user);
+            member.setMemberId(generateMemberId(user));
+            member.setFirstName(signUpDTO.getFirstName());
+            member.setLastName(signUpDTO.getLastName());
+            member.setEmailId(user.getEmail());
+            member.setUser(user);
+            memberRepository.save(member);
+            return "User registered successfully";
+        } finally {
+            // Ensure the context is cleared to prevent memory leaks
+            UserContextUtil.clear();
+        }
     }
+
 
     @Override
     public String resetUserPassword(ResetPasswordDTO resetPasswordDTO) {
         Optional<User> user = userRepository.findByUsername(resetPasswordDTO.getUsername());
-        if (!user.isPresent()) {
-          return "User not found";
+        if (user.isEmpty()) {
+            return "User not found";
         }
-        User activeUser = user.get();
-        activeUser.setPassword(passwordEncoder.encode(resetPasswordDTO.getPassword()));
-        userRepository.save(activeUser);
-        return "Password changed successfully";
+        try {
+            // Set username for auditing when authentication is missing
+            UserContextUtil.setUser(resetPasswordDTO.getUsername());
+            User activeUser = user.get();
+            // Check if currentPassword is provided and validate it
+            if (resetPasswordDTO.getCurrentPassword() != null) {
+                if (!passwordEncoder.matches(resetPasswordDTO.getCurrentPassword(), activeUser.getPassword())) {
+                    return "Incorrect current password";
+                }
+            }
+            // Encode and update password
+            activeUser.setPassword(passwordEncoder.encode(resetPasswordDTO.getPassword()));
+            userRepository.save(activeUser);
+            return "Password changed successfully";
+        } finally {
+            // Ensure UserContextUtil is cleared to prevent memory leaks
+            UserContextUtil.clear();
+        }
     }
+
 
     @Override
     public ResponseEntity<LoginResponseDTO> userLoginAuthentication(AuthRequestDTO authRequest) {
@@ -183,7 +211,7 @@ public class UserServiceImpl implements UserService {
         UserRole userRole = new UserRole();
         UserRolePK userRolePK = new UserRolePK();
         userRolePK.setUserId(user.getUserId());
-        userRolePK.setRoleId(2);
+        userRolePK.setRoleId(MEMBER_ROLE_ID);
         userRole.setId(userRolePK);
         return userRoleRepository.save(userRole);
     }
