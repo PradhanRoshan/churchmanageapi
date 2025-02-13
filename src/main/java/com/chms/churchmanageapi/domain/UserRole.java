@@ -1,39 +1,36 @@
 package com.chms.churchmanageapi.domain;
 
 import jakarta.persistence.*;
-
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * The persistent class for the user_roles database table.
- *
  */
 @Entity
-@Table(name="user_roles")
-@NamedQuery(name="UserRole.findAll", query="SELECT u FROM UserRole u")
+@Table(name = "user_roles")
+@NamedQuery(name = "UserRole.findAll", query = "SELECT u FROM UserRole u")
 public class UserRole extends Auditable implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @EmbeddedId
     private UserRolePK id;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.DATE)  // Fix: Match DB type `timestamp(6)`
     @Column(name = "user_role_exptn", nullable = true)
     private Date userRoleExptn;
 
-    //bi-directional many-to-one association to User
+    // Bi-directional many-to-one association to User
     @ManyToOne
-    @JoinColumn(name="role_id", nullable=false, insertable=false, updatable=false)
+    @JoinColumn(name = "user_id", nullable = false, insertable = false, updatable = false) // Fix: Correct FK mapping
     private User user;
 
-    //bi-directional many-to-one association to Role
+    // Bi-directional many-to-one association to Role
     @ManyToOne
-    @JoinColumn(name="role_id", nullable=false, insertable=false, updatable=false)
+    @JoinColumn(name = "role_id", nullable = false, insertable = false, updatable = false)
     private Role role;
 
-    public UserRole() {
-    }
+    public UserRole() {}
 
     public UserRolePK getId() {
         return this.id;

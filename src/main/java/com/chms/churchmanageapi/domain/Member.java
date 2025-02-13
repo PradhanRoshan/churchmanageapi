@@ -2,9 +2,11 @@ package com.chms.churchmanageapi.domain;
 
 import com.chms.churchmanageapi.dto.AddressDto;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import java.io.Serializable;
-import java.util.List;
-import java.util.Date;
+import java.util.*;
 
 @Entity
 @Table(name = "members")
@@ -64,6 +66,30 @@ public class Member extends Auditable implements Serializable {
 
     @OneToMany(mappedBy = "volunteer")
     private List<VolunteerActivity> volunteerActivities;
+
+    @ManyToOne
+    @JoinColumn(name = "application_status_id", referencedColumnName = "application_status_id", nullable = true)
+    private ApplicationStatus applicationStatus;
+
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ApplicationStatusHistory> applicationStatusHistories = new ArrayList<>();
+
+    public List<ApplicationStatusHistory> getApplicationStatusHistories() {
+        return applicationStatusHistories;
+    }
+
+    public void setApplicationStatusHistories(List<ApplicationStatusHistory> applicationStatusHistories) {
+        this.applicationStatusHistories = applicationStatusHistories;
+    }
+
+    public ApplicationStatus getApplicationStatus() {
+        return applicationStatus;
+    }
+
+    public void setApplicationStatus(ApplicationStatus applicationStatus) {
+        this.applicationStatus = applicationStatus;
+    }
 
     public Member() {
     }
