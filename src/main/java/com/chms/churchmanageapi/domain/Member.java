@@ -72,7 +72,7 @@ public class Member extends Auditable implements Serializable {
     private ApplicationStatus applicationStatus;
 
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ApplicationStatusHistory> applicationStatusHistories = new ArrayList<>();
 
     public List<ApplicationStatusHistory> getApplicationStatusHistories() {

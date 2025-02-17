@@ -183,6 +183,7 @@ public class UserServiceImpl implements UserService {
         memberDto.setPhone(member.getPhone());
         memberDto.setMaritalStatus(member.getMaritalStatus());
         memberDto.setStatus(member.getMemberExptn()==null?"Active":"Inactive");
+        memberDto.setApplicationSts(member.getApplicationStatus().getStatusName());
         memberDto.setDttmCreate(member.getDttmCreate());
         return memberDto;
     }

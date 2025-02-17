@@ -30,6 +30,7 @@ public class MemberDto implements Serializable {
     @JsonFormat(pattern="MM-dd-yyyy", timezone="America/New_York")
     private Date memberDob;
     private String status;
+    private String applicationSts;
     private String middleName;
     private String phone;
 

@@ -3,11 +3,14 @@ package com.chms.churchmanageapi.service.impl;
 import com.chms.churchmanageapi.config.AppConstantsUtil;
 import com.chms.churchmanageapi.domain.*;
 import com.chms.churchmanageapi.dto.*;
+import com.chms.churchmanageapi.repository.ApplicationStatusHistoryRepository;
 import com.chms.churchmanageapi.repository.ApplicationStatusRepository;
 import com.chms.churchmanageapi.repository.MemberRepository;
 import com.chms.churchmanageapi.repository.UserRoleRepository;
 import com.chms.churchmanageapi.service.MemberService;
 import com.chms.churchmanageapi.service.UserService;
+import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,9 @@ public class MemberServiceImpl implements MemberService {
     private ApplicationStatusRepository applicationStatusRepository;
     @Autowired
     private UserRoleRepository userRoleRepository;
+
+    @Autowired
+    private ApplicationStatusHistoryRepository applicationStatusHistoryRepository;
 
 //    private static final String APPLICATION_TYPE = "New Registration";
 //    private static final String APPLICATION_COMMENT = "New Registration";
@@ -81,6 +87,42 @@ public class MemberServiceImpl implements MemberService {
         return "Successfully reviewed application decision";
     }
 
+    @Transactional
+    @Override
+    public List<ApplicationStatusHistoryDto> getApplicationProgressHistory(String memberID) {
+        Member member = memberRepository.findById(memberID).orElseThrow(() -> new RuntimeException("Member not found"));
+
+       List<ApplicationStatusHistory> applicationStatusHistoryList = applicationStatusHistoryRepository.findByMember(member);
+       List<ApplicationStatusHistoryDto> applicationStatusHistoryDtoList = new ArrayList<>();
+       for (ApplicationStatusHistory history : applicationStatusHistoryList) {
+           ApplicationStatusHistoryDto statusHistoryDto = new ApplicationStatusHistoryDto();
+           statusHistoryDto.setId(history.getId());
+            statusHistoryDto.setApplicationStatus(history.getApplicationStatus().getStatusName());
+            statusHistoryDto.setApplicationType(history.getApplicationType());
+            statusHistoryDto.setComment(history.getComment());
+            statusHistoryDto.setDttmCreate(history.getDttmCreate());
+            statusHistoryDto.setDttmLstUpdt(history.getDttmLstUpdt());
+            statusHistoryDto.setIdUserCreate(history.getIdUserCreate());
+            statusHistoryDto.setIdUserLstUpdt(history.getIdUserLstUpdt());
+            applicationStatusHistoryDtoList.add(statusHistoryDto);
+       }
+       return applicationStatusHistoryDtoList;
+
+        // Force fetch the list before closing the session
+//        Hibernate.initialize(member.getApplicationStatusHistories());
+//        return member.getApplicationStatusHistories().stream().map(history->{
+//            ApplicationStatusHistoryDto statusHistoryDto = new ApplicationStatusHistoryDto();
+//            statusHistoryDto.setId(history.getId());
+//            statusHistoryDto.setApplicationStatus(history.getApplicationStatus().getStatusName());
+//            statusHistoryDto.setApplicationType(history.getApplicationType());
+//            statusHistoryDto.setComment(history.getComment());
+//            statusHistoryDto.setDttmCreate(history.getDttmCreate());
+//            statusHistoryDto.setDttmLstUpdt(history.getDttmLstUpdt());
+//            statusHistoryDto.setIdUserCreate(history.getIdUserCreate());
+//            statusHistoryDto.setIdUserLstUpdt(history.getIdUserLstUpdt());
+//           return statusHistoryDto;
+//        }).collect(Collectors.toList());
+    }
 
 
 //    @Override
