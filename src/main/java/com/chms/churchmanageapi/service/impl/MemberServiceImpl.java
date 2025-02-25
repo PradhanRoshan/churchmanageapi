@@ -3,14 +3,10 @@ package com.chms.churchmanageapi.service.impl;
 import com.chms.churchmanageapi.config.AppConstantsUtil;
 import com.chms.churchmanageapi.domain.*;
 import com.chms.churchmanageapi.dto.*;
-import com.chms.churchmanageapi.repository.ApplicationStatusHistoryRepository;
-import com.chms.churchmanageapi.repository.ApplicationStatusRepository;
-import com.chms.churchmanageapi.repository.MemberRepository;
-import com.chms.churchmanageapi.repository.UserRoleRepository;
+import com.chms.churchmanageapi.repository.*;
 import com.chms.churchmanageapi.service.MemberService;
 import com.chms.churchmanageapi.service.UserService;
 import jakarta.transaction.Transactional;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,10 +27,10 @@ public class MemberServiceImpl implements MemberService {
     private ApplicationStatusRepository applicationStatusRepository;
     @Autowired
     private UserRoleRepository userRoleRepository;
-
     @Autowired
     private ApplicationStatusHistoryRepository applicationStatusHistoryRepository;
-
+    @Autowired
+    private AddressRepository addressRepository;
 //    private static final String APPLICATION_TYPE = "New Registration";
 //    private static final String APPLICATION_COMMENT = "New Registration";
 
@@ -122,6 +118,46 @@ public class MemberServiceImpl implements MemberService {
 //            statusHistoryDto.setIdUserLstUpdt(history.getIdUserLstUpdt());
 //           return statusHistoryDto;
 //        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public UpdateUserProfileDTO updateUserProfile(UpdateUserProfileDTO updateUserProfileDTO) {
+    Optional<Member> member = memberRepository.findById(updateUserProfileDTO.getMember().getMemberId());
+
+    UpdateUserProfileDTO updateUserProfileDTO1 = new UpdateUserProfileDTO();
+
+    if (member.isPresent()) {
+
+        Member memberDetails = member.get();
+
+//        memberDetails.getAddress() != null?
+
+        Address address = saveAddress(updateUserProfileDTO.getAddress());
+
+        System.out.println(address.getIdAddr());
+        memberDetails.setAddress(address);
+        memberDetails.setMemberDob(updateUserProfileDTO.getMember().getMemberDob());
+        memberDetails.setMaritalStatus(updateUserProfileDTO.getMember().getMaritalStatus());
+        memberDetails.setGender(updateUserProfileDTO.getMember().getGender());
+        memberDetails.setMiddleName(updateUserProfileDTO.getMember().getMiddleName());
+        memberDetails.setPhone(updateUserProfileDTO.getMember().getPhoneNumber());
+
+        memberRepository.save(memberDetails);
+
+    }
+
+
+        return null;
+    }
+
+    private Address saveAddress(AddressDto address) {
+        Address addressDetails = new Address();
+        addressDetails.setCity(address.getCity());
+        addressDetails.setState(address.getState());
+        addressDetails.setAptNo(address.getAptNo());
+        addressDetails.setStreet(address.getStreet());
+        addressDetails.setZip(address.getZip());
+        return  addressRepository.save(addressDetails);
     }
 
 

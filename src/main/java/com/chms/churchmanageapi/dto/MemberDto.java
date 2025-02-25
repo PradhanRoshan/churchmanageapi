@@ -32,6 +32,5 @@ public class MemberDto implements Serializable {
     private String status;
     private String applicationSts;
     private String middleName;
-    private String phone;
 
 }

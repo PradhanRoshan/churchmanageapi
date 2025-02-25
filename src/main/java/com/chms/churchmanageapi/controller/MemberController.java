@@ -3,6 +3,7 @@ package com.chms.churchmanageapi.controller;
 import com.chms.churchmanageapi.dto.ApplicationReviewDecisionDTO;
 import com.chms.churchmanageapi.dto.ApplicationStatusHistoryDto;
 import com.chms.churchmanageapi.dto.RegistrationTrackingDTO;
+import com.chms.churchmanageapi.dto.UpdateUserProfileDTO;
 import com.chms.churchmanageapi.service.MemberService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -35,6 +36,10 @@ public class MemberController {
         return  memberService.reviewApplicationDecision(reviewDecisionDTO);
     }
 
+    @PostMapping(value = "/update-user-profile", produces = "application/json")
+    public UpdateUserProfileDTO updateUserProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO){
+        return  memberService.updateUserProfile(updateUserProfileDTO);
+    }
 
     @GetMapping(value = "/application-progress/{memberID}", produces = "application/json")
     public List<ApplicationStatusHistoryDto> getAppStsHistory(@PathVariable String memberID){

@@ -180,7 +180,7 @@ public class UserServiceImpl implements UserService {
         memberDto.setMemberDob(member.getMemberDob());
         memberDto.setMiddleName(member.getMiddleName());
         memberDto.setGender(member.getGender());
-        memberDto.setPhone(member.getPhone());
+        memberDto.setPhoneNumber(member.getPhone());
         memberDto.setMaritalStatus(member.getMaritalStatus());
         memberDto.setStatus(member.getMemberExptn()==null?"Active":"Inactive");
         memberDto.setApplicationSts(member.getApplicationStatus().getStatusName());

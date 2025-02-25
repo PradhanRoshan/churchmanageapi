@@ -44,6 +44,8 @@ public class Address extends Auditable implements Serializable {
     public Address() {
     }
 
+
+
     public long getIdAddr() {
         return this.idAddr;
     }
