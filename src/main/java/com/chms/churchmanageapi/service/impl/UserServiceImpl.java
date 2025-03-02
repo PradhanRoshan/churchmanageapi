@@ -94,6 +94,26 @@ public class UserServiceImpl implements UserService {
         applicationStatusHistoryRepository.save(history);
     }
 
+    @Override
+    public UserDetialsDto getUserDetails(String memberID) {
+        Optional<Member> member = memberRepository.findById(memberID);
+
+        UserDetialsDto userDetialsDto = null;
+        if (member.isPresent()) {
+            userDetialsDto= new UserDetialsDto();
+            Member memberDetails = member.get();
+            userDetialsDto.setUser(getUserDtoDetials(memberDetails.getUser()));
+            userDetialsDto.setMember(getMemberDtoDetails(memberDetails));
+            if (memberDetails.getAddress() != null) {
+                userDetialsDto.setAddress(getAddressDtoDetails(memberDetails.getAddress()));
+            }
+            userDetialsDto.setRole(getRoleDtoDetails(memberDetails.getUser().getUserId()));
+
+            return userDetialsDto;
+        }
+
+        return userDetialsDto;
+    }
 
 
     @Override

@@ -37,7 +37,7 @@ public class MemberController {
     }
 
     @PostMapping(value = "/update-user-profile", produces = "application/json")
-    public UpdateUserProfileDTO updateUserProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO){
+    public String updateUserProfile(@RequestBody UpdateUserProfileDTO updateUserProfileDTO){
         return  memberService.updateUserProfile(updateUserProfileDTO);
     }
 

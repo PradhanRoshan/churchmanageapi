@@ -121,19 +121,18 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public UpdateUserProfileDTO updateUserProfile(UpdateUserProfileDTO updateUserProfileDTO) {
+    public String updateUserProfile(UpdateUserProfileDTO updateUserProfileDTO) {
     Optional<Member> member = memberRepository.findById(updateUserProfileDTO.getMember().getMemberId());
-
-    UpdateUserProfileDTO updateUserProfileDTO1 = new UpdateUserProfileDTO();
-
-    if (member.isPresent()) {
-
+    if (member.isEmpty()) {
+        return "Member not found";
+    }
         Member memberDetails = member.get();
-
 //        memberDetails.getAddress() != null?
-
+        if(null != memberDetails.getAddress()){
+            memberDetails.getAddress().setAddrExptn(new Date());
+            addressRepository.save(memberDetails.getAddress());
+        }
         Address address = saveAddress(updateUserProfileDTO.getAddress());
-
         System.out.println(address.getIdAddr());
         memberDetails.setAddress(address);
         memberDetails.setMemberDob(updateUserProfileDTO.getMember().getMemberDob());
@@ -141,13 +140,8 @@ public class MemberServiceImpl implements MemberService {
         memberDetails.setGender(updateUserProfileDTO.getMember().getGender());
         memberDetails.setMiddleName(updateUserProfileDTO.getMember().getMiddleName());
         memberDetails.setPhone(updateUserProfileDTO.getMember().getPhoneNumber());
-
         memberRepository.save(memberDetails);
-
-    }
-
-
-        return null;
+        return "Successfully updated user profile";
     }
 
     private Address saveAddress(AddressDto address) {

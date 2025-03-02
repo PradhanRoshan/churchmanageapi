@@ -17,5 +17,5 @@ public interface MemberService {
 
     List<ApplicationStatusHistoryDto> getApplicationProgressHistory(String memberID);
 
-    UpdateUserProfileDTO updateUserProfile(UpdateUserProfileDTO updateUserProfileDTO);
+    String updateUserProfile(UpdateUserProfileDTO updateUserProfileDTO);
 }
