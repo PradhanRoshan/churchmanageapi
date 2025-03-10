@@ -17,6 +17,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class ApplicationStatusDto implements Serializable {
     private static final long serialVersionUID = -5533758224834880220L;
-    private  Long statusId;
+    private  long statusId;
     private  String statusName;
 }

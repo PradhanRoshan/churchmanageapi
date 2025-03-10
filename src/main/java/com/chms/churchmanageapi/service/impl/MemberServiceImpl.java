@@ -32,7 +32,10 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     private AddressRepository addressRepository;
 //    private static final String APPLICATION_TYPE = "New Registration";
-//    private static final String APPLICATION_COMMENT = "New Registration";
+//    private static final String APPLICATION_COMMENT = "New Registration"; Submitted
+    private static final Integer MEMBER_ROLE_ID = 2;
+    private static final long ID_APPL_STS_SUBMITTED = 1;
+
 
 
     @Override
@@ -54,31 +57,31 @@ public class MemberServiceImpl implements MemberService {
         Member memberDetails = memberRepository.findById(reviewDecisionDTO.getMemberId())
                 .orElseThrow(() -> new RuntimeException("Member not found"));
 
-        if (reviewDecisionDTO.getApplicationStatus().getStatusId() == 2) {
+//        Handling Submitted application Status
+        if (ID_APPL_STS_SUBMITTED == reviewDecisionDTO.getApplicationStatus().getStatusId()) {
 
-            Optional<UserRole> userRole = userRoleRepository.findByIdUserIdAndUserRoleExptnIsNull(memberDetails.getUser().getUserId());
-            if (userRole.isPresent()) {
-                UserRole userRoleDetails = userRole.get();
+//            Optional<UserRole> userRole = userRoleRepository.findById_UserIdAndId_RoleIdAndUserRoleExptnIsNull(memberDetails.getUser().getUserId(), reviewDecisionDTO.getRole().getRoleId());
+//            if (userRole.isEmpty()) {
+            if (MEMBER_ROLE_ID != reviewDecisionDTO.getRole().getRoleId()) {
+                UserRole userRoleDetails = userRoleRepository.findByIdUserIdAndUserRoleExptnIsNull(memberDetails.getUser().getUserId()).get();
                 userRoleDetails.setUserRoleExptn(new Date());
-                userRoleRepository.save(userRoleDetails);
+                UserRolePK userRolePK = new UserRolePK();
+                userRolePK.setUserId(memberDetails.getUser().getUserId());
+                userRolePK.setRoleId(reviewDecisionDTO.getRole().getRoleId());
+                UserRole userRoles = new UserRole();
+                userRoles.setId(userRolePK);
+                userRoleRepository.save(userRoles);
             }
-            UserRolePK userRolePK = new UserRolePK();
-            userRolePK.setUserId(memberDetails.getUser().getUserId());
-            userRolePK.setRoleId(reviewDecisionDTO.getRole().getRoleId());
-            UserRole userRoles = new UserRole();
-            userRoles.setId(userRolePK);
-            userRoleRepository.save(userRoles);
-
             // Update Application Status
             ApplicationStatus applicationStatus = applicationStatusRepository
-                    .findById(reviewDecisionDTO.getApplicationStatus().getStatusId())
+                    .findById(2L)
                     .orElseThrow(() -> new RuntimeException("Application status not found"));
 
             memberDetails.setApplicationStatus(applicationStatus);
             memberRepository.save(memberDetails);
 
             // ✅ Log Application Status
-            userService.logApplicationStatus(memberDetails, AppConstantsUtil.APPLICATION_TYPE, AppConstantsUtil.APPLICATION_COMMENT);
+            userService.logApplicationStatus(memberDetails, AppConstantsUtil.APPLICATION_TYPE, AppConstantsUtil.IPROGRESS_APPL_COMMENT);
         }
         return "Successfully reviewed application decision";
     }

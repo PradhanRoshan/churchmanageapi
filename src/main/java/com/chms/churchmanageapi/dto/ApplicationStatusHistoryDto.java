@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 @Setter
 public class ApplicationStatusHistoryDto implements Serializable {
     private static final long serialVersionUID = 3475367302150381605L;
-    private Long id;
+    private long id;
     private String applicationStatus;
     private String applicationType;
     private String comment;
