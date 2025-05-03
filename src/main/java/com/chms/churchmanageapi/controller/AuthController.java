@@ -36,15 +36,6 @@ public class AuthController {
     public ResponseEntity<LoginResponseDTO> createAuthenticationToken(@RequestBody AuthRequestDTO authRequest) throws Exception {
 
        return userService.userLoginAuthentication(authRequest);
-//        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-//        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-//        final String jwt = jwtUtil.generateToken(userDetails);
-//        LoginResponseDTO loginResponse = new LoginResponseDTO();//.setToken(jwt).setExpiresIn(jwtService.getExpirationTime());
-//        loginResponse.setToken(jwt);
-//        loginResponse.setUserRole(2);
-//        loginResponse.setExpiresIn(jwtUtil.getExpirationTime());
-//
-//        return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping(value = "/signup", produces = "application/json")

@@ -2,6 +2,7 @@ package com.chms.churchmanageapi.domain;
 
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
@@ -36,7 +37,7 @@ public class User extends Auditable implements Serializable, UserDetails {
     @OneToOne(mappedBy = "user")
     private Member member;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -96,7 +97,9 @@ public class User extends Auditable implements Serializable, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getRoleName())) // or role.getRoleName()
+                .toList();
     }
 
     public String getPassword() {

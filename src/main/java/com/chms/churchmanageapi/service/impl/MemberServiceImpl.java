@@ -106,21 +106,6 @@ public class MemberServiceImpl implements MemberService {
             applicationStatusHistoryDtoList.add(statusHistoryDto);
        }
        return applicationStatusHistoryDtoList;
-
-        // Force fetch the list before closing the session
-//        Hibernate.initialize(member.getApplicationStatusHistories());
-//        return member.getApplicationStatusHistories().stream().map(history->{
-//            ApplicationStatusHistoryDto statusHistoryDto = new ApplicationStatusHistoryDto();
-//            statusHistoryDto.setId(history.getId());
-//            statusHistoryDto.setApplicationStatus(history.getApplicationStatus().getStatusName());
-//            statusHistoryDto.setApplicationType(history.getApplicationType());
-//            statusHistoryDto.setComment(history.getComment());
-//            statusHistoryDto.setDttmCreate(history.getDttmCreate());
-//            statusHistoryDto.setDttmLstUpdt(history.getDttmLstUpdt());
-//            statusHistoryDto.setIdUserCreate(history.getIdUserCreate());
-//            statusHistoryDto.setIdUserLstUpdt(history.getIdUserLstUpdt());
-//           return statusHistoryDto;
-//        }).collect(Collectors.toList());
     }
 
     @Override

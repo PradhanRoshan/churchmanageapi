@@ -44,6 +44,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Ensure CORS is applied
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/**").hasRole("Admin")
                         .requestMatchers("/auth/login", "/auth/signup", "/auth/reset-password").permitAll()
                         .anyRequest().authenticated()
                 )
