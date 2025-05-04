@@ -25,6 +25,11 @@ CREATE TABLE address (
   state VARCHAR(255) DEFAULT NULL,
   street VARCHAR(255) DEFAULT NULL,
   zip VARCHAR(255) DEFAULT NULL,
+  addr_exptn DATE DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (id_addr)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -34,6 +39,11 @@ CREATE TABLE users (
   username VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
+  user_exptn DATE DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -41,6 +51,11 @@ CREATE TABLE users (
 CREATE TABLE roles (
   role_id BIGINT(20) NOT NULL AUTO_INCREMENT,
   role_name VARCHAR(255) NOT NULL,
+  role_exptn DATE DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (role_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -48,6 +63,11 @@ CREATE TABLE roles (
 CREATE TABLE user_roles (
   user_id BIGINT(20) NOT NULL,
   role_id BIGINT(20) NOT NULL,
+  user_role_exptn DATE DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (user_id, role_id),
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
   FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE CASCADE
@@ -59,14 +79,18 @@ CREATE TABLE members (
   user_id BIGINT(20) DEFAULT NULL,
   email_id VARCHAR(255) DEFAULT NULL,
   first_name VARCHAR(255) NOT NULL,
-  gender VARCHAR(255) NOT NULL,
+  gender VARCHAR(255) DEFAULT NULL,
   last_name VARCHAR(255) NOT NULL,
-  marital_status VARCHAR(255) NOT NULL,
-  member_dob DATE NOT NULL,
+  marital_status VARCHAR(255) DEFAULT NULL,
+  member_dob DATE DEFAULT NULL,
   member_exptn DATE DEFAULT NULL,
   middle_name VARCHAR(255) DEFAULT NULL,
-  phone VARCHAR(255) NOT NULL,
+  phone VARCHAR(255) DEFAULT NULL,
   id_addr BIGINT(20) DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (member_id),
   KEY FK_member_address (id_addr),
   KEY FK_member_user (user_id),
@@ -84,6 +108,10 @@ CREATE TABLE church_information (
   chur_website VARCHAR(255) NOT NULL,
   church_exptn DATE DEFAULT NULL,
   id_addr BIGINT(20) DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (church_id),
   KEY FK_church_address (id_addr),
   FOREIGN KEY (id_addr) REFERENCES address(id_addr) ON DELETE SET NULL
@@ -93,6 +121,10 @@ CREATE TABLE church_information (
 CREATE TABLE fund_type (
   fund_typeid BIGINT(20) NOT NULL AUTO_INCREMENT,
   fund_type_name VARCHAR(255) NOT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (fund_typeid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -100,6 +132,10 @@ CREATE TABLE fund_type (
 CREATE TABLE payment_method (
   payment_method_id BIGINT(20) NOT NULL AUTO_INCREMENT,
   payment_method_name VARCHAR(255) NOT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (payment_method_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -112,6 +148,11 @@ CREATE TABLE tithe_and_offering (
   fund_type_id BIGINT(20) DEFAULT NULL,
   member_id CHAR(8) DEFAULT NULL,
   payment_method_id BIGINT(20) DEFAULT NULL,
+  tithe_offering_exptn DATE DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (tithe_offering_id),
   KEY FK_fund_type_id (fund_type_id),
   KEY FK_member_id (member_id),
@@ -127,6 +168,10 @@ CREATE TABLE logs (
   user_id BIGINT(20) NOT NULL,
   action VARCHAR(255) NOT NULL,
   log_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (log_id),
   KEY FK_user_id (user_id),
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
@@ -139,6 +184,11 @@ CREATE TABLE events (
   event_date DATETIME NOT NULL,
   event_location VARCHAR(255) NOT NULL,
   event_description TEXT,
+  event_exptn DATE DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (event_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -148,6 +198,11 @@ CREATE TABLE registrations (
   event_id BIGINT(20) NOT NULL,
   member_id CHAR(8) NOT NULL,
   registration_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  registration_exptn DATE DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (registration_id),
   KEY FK_event_id (event_id),
   KEY FK_member_id (member_id),
@@ -162,6 +217,10 @@ CREATE TABLE volunteer_activities (
   activity_name VARCHAR(100) NOT NULL,
   activity_date DATETIME NOT NULL,
   volunteer_id CHAR(8),
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (activity_id),
   KEY FK_event_id (event_id),
   KEY FK_volunteer_id (volunteer_id),
@@ -175,6 +234,11 @@ CREATE TABLE budgets (
   year YEAR NOT NULL,
   amount DECIMAL(10,2) NOT NULL,
   allocated_amount DECIMAL(10,2),
+  budget_exptn DATE DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (budget_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -185,6 +249,10 @@ CREATE TABLE communications (
   receiver_id BIGINT(20),
   message TEXT NOT NULL,
   sent_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (communication_id),
   KEY FK_sender_id (sender_id),
   KEY FK_receiver_id (receiver_id),
@@ -199,6 +267,11 @@ CREATE TABLE reports (
   generated_by BIGINT(20),
   generated_date DATETIME DEFAULT CURRENT_TIMESTAMP,
   content TEXT NOT NULL,
+  report_exptn DATE DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (report_id),
   KEY FK_generated_by (generated_by),
   FOREIGN KEY (generated_by) REFERENCES users(user_id) ON DELETE SET NULL
@@ -210,6 +283,11 @@ CREATE TABLE family_relations (
   member_id CHAR(8) NOT NULL,
   related_member_id CHAR(8) NOT NULL,
   relationship VARCHAR(20) NOT NULL,
+  fam_rel_exptn DATE DEFAULT NULL,
+  id_user_create varchar(255) DEFAULT NULL,
+  dttm_create datetime(6) DEFAULT NULL,
+  id_user_lst_updt varchar(255) DEFAULT NULL,
+  dttm_lst_updt datetime(6) DEFAULT NULL,
   PRIMARY KEY (relation_id),
   KEY FK_member_id (member_id),
   KEY FK_related_member_id (related_member_id),
