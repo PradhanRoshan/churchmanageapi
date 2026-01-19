@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.chms.churchmanageapi.config.AppConstantsUtil.*;
+
 @Service
 public class MemberServiceImpl implements MemberService {
     
@@ -35,6 +37,8 @@ public class MemberServiceImpl implements MemberService {
 //    private static final String APPLICATION_COMMENT = "New Registration"; Submitted
     private static final Integer MEMBER_ROLE_ID = 2;
     private static final long ID_APPL_STS_SUBMITTED = 1;
+    private static final long ID_APPL_STS_APPROVED = 4;
+    private static final long ID_APPL_STS_REJECTED = 5;
 
 
 
@@ -73,17 +77,36 @@ public class MemberServiceImpl implements MemberService {
                 userRoleRepository.save(userRoles);
             }
             // Update Application Status
-            ApplicationStatus applicationStatus = applicationStatusRepository
-                    .findById(2L)
-                    .orElseThrow(() -> new RuntimeException("Application status not found"));
-
+            ApplicationStatus applicationStatus = memberDetails.getAddress() !=null? getApplicationStatusById(APPL_STS_READY):getApplicationStatusById(APPL_STS_IN_PROGRESS);
             memberDetails.setApplicationStatus(applicationStatus);
             memberRepository.save(memberDetails);
 
             // ✅ Log Application Status
-            userService.logApplicationStatus(memberDetails, AppConstantsUtil.APPLICATION_TYPE, AppConstantsUtil.IPROGRESS_APPL_COMMENT);
+            userService.logApplicationStatus(memberDetails, APPLICATION_TYPE, "Ready".equals(applicationStatus.getStatusName())?READY_APPL_COMMENT:IPROGRESS_APPL_COMMENT);
+        }
+        // Handling Approved application Status
+        else if (ID_APPL_STS_APPROVED == reviewDecisionDTO.getApplicationStatus().getStatusId()) {
+            ApplicationStatus applicationStatus = getApplicationStatusById(ID_APPL_STS_APPROVED);
+            memberDetails.setApplicationStatus(applicationStatus);
+            memberRepository.save(memberDetails);
+            // ✅ Log Application Status
+            userService.logApplicationStatus(memberDetails, APPLICATION_TYPE, APPROVED_APPL_COMMENT);
+        }
+        // Handling Rejected application Status
+        else if (ID_APPL_STS_REJECTED == reviewDecisionDTO.getApplicationStatus().getStatusId()) {
+            ApplicationStatus applicationStatus = getApplicationStatusById(ID_APPL_STS_REJECTED);
+            memberDetails.setApplicationStatus(applicationStatus);
+            memberRepository.save(memberDetails);
+            // ✅ Log Application Status
+            userService.logApplicationStatus(memberDetails, APPLICATION_TYPE, REJECTED_APPL_COMMENT);
         }
         return "Successfully reviewed application decision";
+    }
+
+    private ApplicationStatus getApplicationStatusById(long idApplSts) {
+        return applicationStatusRepository
+                .findById(idApplSts)
+                .orElseThrow(() -> new RuntimeException("Application status not found"));
     }
 
     @Transactional
@@ -128,6 +151,12 @@ public class MemberServiceImpl implements MemberService {
         memberDetails.setGender(updateUserProfileDTO.getMember().getGender());
         memberDetails.setMiddleName(updateUserProfileDTO.getMember().getMiddleName());
         memberDetails.setPhone(updateUserProfileDTO.getMember().getPhoneNumber());
+ // ✅ Log Application Status
+        if(memberDetails.getApplicationStatus().getId() == APPL_STS_IN_PROGRESS){
+            ApplicationStatus applicationStatus = getApplicationStatusById(APPL_STS_READY);
+            memberDetails.setApplicationStatus(applicationStatus);
+            userService.logApplicationStatus(memberDetails, AppConstantsUtil.APPLICATION_TYPE, AppConstantsUtil.READY_APPL_COMMENT);
+        }
         memberRepository.save(memberDetails);
         return "Successfully updated user profile";
     }
