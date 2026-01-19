@@ -27,7 +27,7 @@ public class MemberDto implements Serializable {
     private String phoneNumber;
     @JsonFormat(pattern="MM-dd-yyyy", timezone="America/New_York")
     private Timestamp dttmCreate;
-    @JsonFormat(pattern="MM-dd-yyyy", timezone="America/New_York")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "America/New_York")
     private Date memberDob;
     private String status;
     private String applicationSts;

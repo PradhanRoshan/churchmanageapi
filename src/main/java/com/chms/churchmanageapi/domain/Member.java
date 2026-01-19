@@ -1,11 +1,9 @@
 package com.chms.churchmanageapi.domain;
 
-import com.chms.churchmanageapi.dto.AddressDto;
 import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.*;
 
 @Entity

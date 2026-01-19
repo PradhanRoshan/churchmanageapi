@@ -57,6 +57,10 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByUsername(signUpDTO.getUser().getUsername()).isPresent()) {
             return "Username is already in use";
         }
+        if (signUpDTO.getUser().getEmail() != null &&
+                userRepository.findByEmail(signUpDTO.getUser().getEmail()).isPresent()) {
+            return "Email is already in use";
+        }
         try {
             UserContextUtil.setUser(signUpDTO.getUser().getUsername());
             // ✅ Create User & Save
