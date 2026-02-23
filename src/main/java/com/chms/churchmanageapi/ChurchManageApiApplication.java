@@ -18,11 +18,10 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.text.SimpleDateFormat;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.chms.churchmanageapi")
 @EnableAsync
 @EnableCaching
 @EntityScan("com.chms.churchmanageapi.domain")
-@ComponentScan(basePackages = {"com.chms.churchmanageapi.*"})
 //@SpringBootApplication(scanBasePackages = "com.chms.churchmanageapi")
 public class ChurchManageApiApplication extends SpringBootServletInitializer {
 
