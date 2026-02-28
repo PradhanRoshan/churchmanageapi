@@ -4,11 +4,13 @@ import com.chms.churchmanageapi.config.AppConstantsUtil;
 import com.chms.churchmanageapi.domain.*;
 import com.chms.churchmanageapi.dto.*;
 import com.chms.churchmanageapi.repository.*;
+import com.chms.churchmanageapi.service.CommentsService;
 import com.chms.churchmanageapi.service.MemberService;
 import com.chms.churchmanageapi.service.UserService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,21 +22,33 @@ import static com.chms.churchmanageapi.config.AppConstantsUtil.*;
 
 @Service
 public class MemberServiceImpl implements MemberService {
-    
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ApplicationStatusRepository applicationStatusRepository;
-    @Autowired
-    private UserRoleRepository userRoleRepository;
-    @Autowired
-    private ApplicationStatusHistoryRepository applicationStatusHistoryRepository;
-    @Autowired
-    private AddressRepository addressRepository;
-//    private static final String APPLICATION_TYPE = "New Registration";
-//    private static final String APPLICATION_COMMENT = "New Registration"; Submitted
+
+    private final MemberRepository memberRepository;
+    private final UserService userService;
+    private final CommentsService commentsService;
+    private final ApplicationStatusRepository applicationStatusRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final ApplicationStatusHistoryRepository applicationStatusHistoryRepository;
+    private final AddressRepository addressRepository;
+
+    public MemberServiceImpl(
+            MemberRepository memberRepository,
+            UserService userService,
+            CommentsService commentsService,
+            ApplicationStatusRepository applicationStatusRepository,
+            UserRoleRepository userRoleRepository,
+            ApplicationStatusHistoryRepository applicationStatusHistoryRepository,
+            AddressRepository addressRepository
+    ) {
+        this.memberRepository = memberRepository;
+        this.userService = userService;
+        this.commentsService = commentsService;
+        this.applicationStatusRepository = applicationStatusRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.applicationStatusHistoryRepository = applicationStatusHistoryRepository;
+        this.addressRepository = addressRepository;
+    }
+
     private static final Integer MEMBER_ROLE_ID = 2;
     private static final long ID_APPL_STS_SUBMITTED = 1;
     private static final long ID_APPL_STS_APPROVED = 4;
@@ -51,6 +65,7 @@ public class MemberServiceImpl implements MemberService {
                     registrationTrackingDTO.setRole(userService.getRoleDtoDetails(member.getUser().getUserId()));
                     registrationTrackingDTO.setApplicationStatus(getApplicationStatusDetials(member.getApplicationStatus()));
                     registrationTrackingDTO.setAddress((member.getAddress() != null) ? userService.getAddressDtoDetails(member.getAddress()) : null);
+                    registrationTrackingDTO.setComments(commentsService.getComments(member.getMemberId()));
                     return registrationTrackingDTO;
                 })
                 .collect(Collectors.toList());
@@ -159,6 +174,31 @@ public class MemberServiceImpl implements MemberService {
         }
         memberRepository.save(memberDetails);
         return "Successfully updated user profile";
+    }
+
+    /**
+     * @param memberID
+     * @return
+     */
+    @Override
+    public ApplicationDetialsDTO getApplicationDetials(String memberID) {
+        // Validate input
+        if (memberID == null || memberID.trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "memberID must be provided");
+        }
+        UserDetialsDto userDetialsDto = userService.getUserDetails(memberID);
+        List<RgstrnRqstCmntDTO> rgstrnRqstCmnts = commentsService.getComments(memberID);
+
+        if (userDetialsDto == null || userDetialsDto.getMember() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found for id: " + memberID);
+        }
+
+        // Create a sanitized copy of UserDetialsDto to avoid leaking credentials or internal user object
+        UserDetialsDto detialsDto = new UserDetialsDto();
+        detialsDto.setMember(userDetialsDto.getMember());
+        detialsDto.setRole(userDetialsDto.getRole());
+        detialsDto.setAddress(userDetialsDto.getAddress());
+        return new ApplicationDetialsDTO(detialsDto, rgstrnRqstCmnts);
     }
 
     private Address saveAddress(AddressDto address) {

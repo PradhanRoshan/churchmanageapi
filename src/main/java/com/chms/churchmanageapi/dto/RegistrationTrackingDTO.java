@@ -21,4 +21,5 @@ public class RegistrationTrackingDTO implements Serializable {
     private RoleDto role;
     private  AddressDto address;
     private  ApplicationStatusDto applicationStatus;
+    private List<RgstrnRqstCmntDTO> comments;
 }
