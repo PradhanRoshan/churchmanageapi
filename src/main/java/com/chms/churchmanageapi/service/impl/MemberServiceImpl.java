@@ -56,6 +56,25 @@ public class MemberServiceImpl implements MemberService {
 
 
 
+    /**
+     * Builds a registration tracking view for all members.
+     * <p>
+     * For each {@link Member} returned by {@link MemberRepository#findAll()}, this method constructs a
+     * {@link RegistrationTrackingDTO} by:
+     * <ul>
+     *   <li>Mapping the member entity to a {@code MemberDto} via {@link UserService#getMemberDtoDetails(Member)}.</li>
+     *   <li>Resolving role details via {@link UserService} using the member's user id.</li>
+     *   <li>Mapping the current {@link ApplicationStatus} to an {@link ApplicationStatusDto}.
+     *       If the status is {@code null}, the DTO status will be {@code null}.</li>
+     *   <li>Mapping the member's {@link Address} to an {@link AddressDto} when present; otherwise {@code null}.</li>
+     *   <li>Fetching the member's registration request comments via {@link CommentsService#getComments(String)}.</li>
+     * </ul>
+     *
+     * @return a list of registration tracking DTOs; never {@code null} (maybe empty when no members exist)
+     *
+     * @throws RuntimeException if underlying dependencies throw (for example, if a member has an unexpected
+     *                          null {@code user} or {@code userId})
+     */
     @Override
     public List<RegistrationTrackingDTO> getRegistrationTracking() {
         return memberRepository.findAll().stream()
@@ -111,6 +130,8 @@ public class MemberServiceImpl implements MemberService {
         else if (ID_APPL_STS_REJECTED == reviewDecisionDTO.getApplicationStatus().getStatusId()) {
             ApplicationStatus applicationStatus = getApplicationStatusById(ID_APPL_STS_REJECTED);
             memberDetails.setApplicationStatus(applicationStatus);
+//            memberDetails.getUser().setUserExptn(new Date());
+            memberDetails.setMemberExptn(new Date());
             memberRepository.save(memberDetails);
             // ✅ Log Application Status
             userService.logApplicationStatus(memberDetails, APPLICATION_TYPE, REJECTED_APPL_COMMENT);
@@ -176,9 +197,24 @@ public class MemberServiceImpl implements MemberService {
         return "Successfully updated user profile";
     }
 
+
     /**
-     * @param memberID
-     * @return
+     * Returns application details for a given member id.
+     * <p>
+     * This method:
+     * <ul>
+     *   <li>Validates that {@code memberID} is not {@code null} and not blank.</li>
+     *   <li>Fetches user/member details via {@link UserService#getUserDetails(String)}.</li>
+     *   <li>Fetches registration request comments via {@link CommentsService#getComments(String)}.</li>
+     *   <li>Creates a sanitized {@link UserDetialsDto} copy containing only member, role, and address
+     *       (to avoid leaking internal objects/credentials if present).</li>
+     * </ul>
+     *
+     * @param memberID the member identifier used to fetch application details (must not be {@code null} or blank)
+     * @return the aggregated application details, including a sanitized user details DTO and associated comments
+     *
+     * @throws ResponseStatusException with {@link HttpStatus#BAD_REQUEST} when {@code memberID} is {@code null} or blank
+     * @throws ResponseStatusException with {@link HttpStatus#NOT_FOUND} when no member details are found for the given id
      */
     @Override
     public ApplicationDetialsDTO getApplicationDetials(String memberID) {
