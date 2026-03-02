@@ -1,9 +1,6 @@
 package com.chms.churchmanageapi.controller;
 
-import com.chms.churchmanageapi.dto.ApplicationReviewDecisionDTO;
-import com.chms.churchmanageapi.dto.ApplicationStatusHistoryDto;
-import com.chms.churchmanageapi.dto.RegistrationTrackingDTO;
-import com.chms.churchmanageapi.dto.UpdateUserProfileDTO;
+import com.chms.churchmanageapi.dto.*;
 import com.chms.churchmanageapi.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -94,4 +91,16 @@ public class MemberController {
         List<ApplicationStatusHistoryDto> history = memberService.getApplicationProgressHistory(memberID);
         return ResponseEntity.ok(history);
     }
+
+    @Operation(summary = "Get application details")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved registration tracking details"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
+    @GetMapping(value = "/getApplicationsDetials/{memberID}", produces = "application/json")
+    public ResponseEntity<ApplicationDetialsDTO> getApplicationDetials(@PathVariable String memberID) {
+        ApplicationDetialsDTO applicationDetialsDTO = memberService.getApplicationDetials(memberID);
+        return ResponseEntity.ok(applicationDetialsDTO);
+    }
+
 }

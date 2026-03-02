@@ -7,7 +7,6 @@ import com.chms.churchmanageapi.dto.*;
 import com.chms.churchmanageapi.repository.*;
 import com.chms.churchmanageapi.service.UserService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,31 +19,41 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private UserRoleRepository userRoleRepository;
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final ApplicationStatusRepository applicationStatusRepository;
+    private final ApplicationStatusHistoryRepository applicationStatusHistoryRepository;
+    private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
 
-    @Autowired
-    private ApplicationStatusRepository applicationStatusRepository;
-
-    @Autowired
-    private ApplicationStatusHistoryRepository applicationStatusHistoryRepository;
-
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
+    public UserServiceImpl(
+            UserRepository userRepository,
+            MemberRepository memberRepository,
+            RoleRepository roleRepository,
+            UserRoleRepository userRoleRepository,
+            PasswordEncoder passwordEncoder,
+            AuthenticationManager authenticationManager,
+            ApplicationStatusRepository applicationStatusRepository,
+            ApplicationStatusHistoryRepository applicationStatusHistoryRepository,
+            JwtUtil jwtUtil,
+            UserDetailsService userDetailsService
+    ) {
+        this.userRepository = userRepository;
+        this.memberRepository = memberRepository;
+        this.roleRepository = roleRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
+        this.applicationStatusRepository = applicationStatusRepository;
+        this.applicationStatusHistoryRepository = applicationStatusHistoryRepository;
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
+    }
 
 //    private static final int MEMBER_ROLE_ID = 2;
 //    private static final long APPL_STS_SUBMITTED = 1L;

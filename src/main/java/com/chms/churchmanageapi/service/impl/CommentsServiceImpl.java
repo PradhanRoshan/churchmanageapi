@@ -4,19 +4,21 @@ import com.chms.churchmanageapi.domain.RgstrnRqstCmnt;
 import com.chms.churchmanageapi.dto.RgstrnRqstCmntDTO;
 import com.chms.churchmanageapi.repository.RgstrnRqstCmntRepository;
 import com.chms.churchmanageapi.service.CommentsService;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZoneId;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CommentsServiceImpl implements CommentsService {
 
     private static final Logger log = LoggerFactory.getLogger(CommentsServiceImpl.class);
-
 
     private final RgstrnRqstCmntRepository rgstrnRqstCmntRepository;
 
@@ -43,36 +45,63 @@ public class CommentsServiceImpl implements CommentsService {
     }
 
     /**
-     * Return all comments for a member ordered newest first.
+     * Fetches all registration request comments for the given member id.
+     *
+     * <p>Ordering: results are returned newest-first based on the entity creation timestamp
+     * ({@code dttmCreate}) as defined by the underlying repository query.</p>
+     *
+     * <p>Validation: if {@code memberID} is {@code null} or blank, this method returns an empty list
+     * and does not call the repository.</p>
+     *
+     * <p>Transactional: executes in a read-only transaction to keep JPA read semantics consistent
+     * and to allow provider optimizations.</p>
      *
      * @param memberID the member identifier to fetch comments for
-     * @return list of comment DTOs (empty list when none found)
+     * @return an immutable empty list when the input is invalid or no comments exist; otherwise a
+     * mutable list of mapped DTOs
      */
     @Override
+    @Transactional(readOnly = true)
     public List<RgstrnRqstCmntDTO> getComments(String memberID) {
-        // Fetch comments for given memberID ordered by creation time (newest first)
-        List<RgstrnRqstCmnt> comments = rgstrnRqstCmntRepository.findByMemberIdOrderByDttmCreateDesc(memberID);
+        if (StringUtils.isBlank(memberID)) {
+            return Collections.emptyList();
+        }
+        final List<RgstrnRqstCmnt> comments = rgstrnRqstCmntRepository.findByMemberIdOrderByDttmCreateDesc(memberID);
+        if (comments == null || comments.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-        // Map entities to DTOs
-        return comments.stream().map(c -> {
-            RgstrnRqstCmntDTO dto = new RgstrnRqstCmntDTO();
-            dto.setId(c.getId());
-            dto.setMemberId(c.getMemberId());
-            dto.setRgstrnRqstCmntRole(c.getRgstrnRqstCmntRole());
-            dto.setTextRgstrnRqstCmnt(c.getTextRgstrnRqstCmnt());
-            dto.setNameRgstrnRqstCmntUser(c.getNameRgstrnRqstCmntUser());
-
-            // Auditable.dttmCreate is a java.sql.Timestamp; convert to LocalDateTime safely
-            try {
-                java.sql.Timestamp ts = c.getDttmCreate();
-                if (ts != null) {
-                    dto.setTimestamp(ts.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime());
-                }
-            } catch (Exception ex) {
-                log.debug("Failed to convert timestamp for comment id={}: {}", c.getId(), ex.getMessage());
+        // Map entities to DTOs (avoid streams to reduce allocations under load)
+        final List<RgstrnRqstCmntDTO> rqstCmntDTOS = new ArrayList<>(comments.size());
+        for (RgstrnRqstCmnt comment : comments) {
+            if (comment == null) {
+                continue;
             }
+            rqstCmntDTOS.add(commentMapDto(comment));
+        }
+        return rqstCmntDTOS;
+    }
 
-            return dto;
-        }).collect(Collectors.toList());
+    private RgstrnRqstCmntDTO commentMapDto(RgstrnRqstCmnt comment) {
+        final RgstrnRqstCmntDTO rqstCmntDTO = new RgstrnRqstCmntDTO();
+        rqstCmntDTO.setId(comment.getId());
+        rqstCmntDTO.setMemberId(comment.getMemberId());
+        rqstCmntDTO.setRgstrnRqstCmntRole(comment.getRgstrnRqstCmntRole());
+        rqstCmntDTO.setTextRgstrnRqstCmnt(comment.getTextRgstrnRqstCmnt());
+        rqstCmntDTO.setNameRgstrnRqstCmntUser(comment.getNameRgstrnRqstCmntUser());
+
+        // Auditable.dttmCreate is a java.sql.Timestamp.
+        // Prefer Timestamp#toLocalDateTime (no implicit zone conversion).
+        try {
+            final Timestamp ts = comment.getDttmCreate();
+            if (ts != null) {
+                rqstCmntDTO.setTimestamp(ts.toLocalDateTime());
+            }
+        } catch (RuntimeException ex) {
+            // Don't fail the whole request for a single bad timestamp.
+            log.debug("Failed to convert timestamp for comment id={}", comment.getId(), ex);
+        }
+
+        return rqstCmntDTO;
     }
 }
