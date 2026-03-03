@@ -8,6 +8,8 @@ import com.chms.churchmanageapi.service.CommentsService;
 import com.chms.churchmanageapi.service.MemberService;
 import com.chms.churchmanageapi.service.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.chms.churchmanageapi.config.AppConstantsUtil.*;
+import static com.chms.churchmanageapi.config.CacheConfig.CACHE_REGISTRATION_TRACKING_ALL;
 
 @Service
 public class MemberServiceImpl implements MemberService {
@@ -76,6 +79,7 @@ public class MemberServiceImpl implements MemberService {
      *                          null {@code user} or {@code userId})
      */
     @Override
+    @Cacheable(cacheNames = CACHE_REGISTRATION_TRACKING_ALL, sync = true)
     public List<RegistrationTrackingDTO> getRegistrationTracking() {
         return memberRepository.findAll().stream()
                 .map(member -> {
@@ -91,6 +95,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CACHE_REGISTRATION_TRACKING_ALL, allEntries = true)
     public String reviewApplicationDecision(ApplicationReviewDecisionDTO reviewDecisionDTO) {
         Member memberDetails = memberRepository.findById(reviewDecisionDTO.getMemberId())
                 .orElseThrow(() -> new RuntimeException("Member not found"));
@@ -168,11 +173,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CACHE_REGISTRATION_TRACKING_ALL, allEntries = true)
     public String updateUserProfile(UpdateUserProfileDTO updateUserProfileDTO) {
-    Optional<Member> member = memberRepository.findById(updateUserProfileDTO.getMember().getMemberId());
-    if (member.isEmpty()) {
-        return "Member not found";
-    }
+        Optional<Member> member = memberRepository.findById(updateUserProfileDTO.getMember().getMemberId());
+        if (member.isEmpty()) {
+            return "Member not found";
+        }
         Member memberDetails = member.get();
 //        memberDetails.getAddress() != null?
         if(null != memberDetails.getAddress()){

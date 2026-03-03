@@ -411,6 +411,90 @@ class MemberServiceImplTest {
         verify(commentsService).getComments("MEM-1");
     }
 
+    @Test
+    void getRegistrationTracking_shouldReturnEmptyList_whenNoMembersExist() {
+        when(memberRepository.findAll()).thenReturn(Collections.emptyList());
+
+        List<RegistrationTrackingDTO> result = sut.getRegistrationTracking();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(memberRepository).findAll();
+        verifyNoInteractions(userService, commentsService);
+    }
+
+    @Test
+    void getRegistrationTracking_shouldSetApplicationStatusNull_whenMemberHasNoStatus() {
+        // Arrange
+        Member member = memberWithUserAndStatus("MEM-1", 1L);
+        member.setApplicationStatus(null);
+
+        when(memberRepository.findAll()).thenReturn(List.of(member));
+        when(userService.getMemberDtoDetails(member)).thenReturn(new MemberDto());
+        when(userService.getRoleDtoDetails(member.getUser().getUserId())).thenReturn(new RoleDto(2L, "MEMBER"));
+        when(commentsService.getComments("MEM-1")).thenReturn(Collections.emptyList());
+
+        // Act
+        List<RegistrationTrackingDTO> result = sut.getRegistrationTracking();
+
+        // Assert
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getApplicationStatus());
+        verify(commentsService).getComments("MEM-1");
+    }
+
+    @Test
+    void getApplicationProgressHistory_shouldReturnEmptyList_whenMemberHasNoHistory() {
+        // Arrange
+        Member member = memberWithUserAndStatus("MEM-1", 1L);
+        when(memberRepository.findById("MEM-1")).thenReturn(Optional.of(member));
+        when(applicationStatusHistoryRepository.findByMember(member)).thenReturn(Collections.emptyList());
+
+        // Act
+        List<ApplicationStatusHistoryDto> result = sut.getApplicationProgressHistory("MEM-1");
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        verify(memberRepository).findById("MEM-1");
+        verify(applicationStatusHistoryRepository).findByMember(member);
+    }
+
+    @Test
+    void getApplicationProgressHistory_shouldThrow_whenMemberNotFound() {
+        when(memberRepository.findById("MEM-404")).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> sut.getApplicationProgressHistory("MEM-404"));
+
+        verify(memberRepository).findById("MEM-404");
+        verifyNoInteractions(applicationStatusHistoryRepository);
+    }
+
+    @Test
+    void getApplicationDetials_shouldReturnSanitizedDetails_whenCommentsEmpty() {
+        UserDetialsDto raw = new UserDetialsDto();
+        raw.setUser(new UserDto());
+        raw.setMember(new MemberDto());
+        raw.setRole(new RoleDto(2L, "MEMBER"));
+        raw.setAddress(new AddressDto());
+
+        when(userService.getUserDetails("MEM-1")).thenReturn(raw);
+        when(commentsService.getComments("MEM-1")).thenReturn(Collections.emptyList());
+
+        ApplicationDetialsDTO result = sut.getApplicationDetials("MEM-1");
+
+        assertNotNull(result);
+        assertNotNull(result.getUserDetails());
+        assertNotNull(result.getComments());
+        assertTrue(result.getComments().isEmpty());
+        assertNull(result.getUserDetails().getUser());
+        assertNotNull(result.getUserDetails().getMember());
+        assertNotNull(result.getUserDetails().getRole());
+
+        verify(userService).getUserDetails("MEM-1");
+        verify(commentsService).getComments("MEM-1");
+    }
+
     private static Member memberWithUserAndStatus(String memberId, long statusId) {
         User user = new User();
         user.setUserId(1L);

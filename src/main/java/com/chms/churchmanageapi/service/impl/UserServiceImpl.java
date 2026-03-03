@@ -7,6 +7,7 @@ import com.chms.churchmanageapi.dto.*;
 import com.chms.churchmanageapi.repository.*;
 import com.chms.churchmanageapi.service.UserService;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import static com.chms.churchmanageapi.config.CacheConfig.CACHE_REGISTRATION_TRACKING_ALL;
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -62,6 +65,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    @CacheEvict(cacheNames = CACHE_REGISTRATION_TRACKING_ALL, allEntries = true)
     public String registerUser(SignUpDTO signUpDTO) {
         if (userRepository.findByUsername(signUpDTO.getUser().getUsername()).isPresent()) {
             return "Username is already in use";
